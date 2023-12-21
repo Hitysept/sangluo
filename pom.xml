@@ -1,0 +1,146 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>cn.sangluo</groupId>
+  <artifactId>sangluo</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>sangluo</name>
+  <url>http://maven.apache.org/</url>
+  <inceptionYear>2001</inceptionYear>
+  <modules>
+    <module>gateway</module>
+    <module>baseserver</module>
+    <module>common</module>
+    <module>oauthserver</module>
+  </modules>
+
+  <distributionManagement>
+    <site>
+      <id>website</id>
+      <url>scp://webhost.company.com/www/website</url>
+    </site>
+  </distributionManagement>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>20</maven.compiler.source>
+    <maven.compiler.target>20</maven.compiler.target>
+    <!--junit 版本号-->
+    <junit.version>4.12</junit.version>
+    <!--log4j 版本号-->
+    <log4j.version>1.2.17</log4j.version>
+    <!--Lombok 版本号-->
+    <lombok.version>1.18.26</lombok.version>
+    <!--jwt 版本号-->
+    <jwt.version>8.16</jwt.version>
+    <!-- sa-token -->
+    <sa.token.version>1.34.0</sa.token.version>
+    <!--MySQL 版本号-->
+    <mysql.version>8.0.32</mysql.version>
+    <!--springboot 版本号-->
+    <spring.boot.version>3.0.2</spring.boot.version>
+    <!--spring cloud 版本号-->
+    <spring.cloud.version>2022.0.0</spring.cloud.version>
+    <!--spring cloud alibaba 版本号-->
+    <spring.cloud.alibaba.version>2022.0.0.0-RC2</spring.cloud.alibaba.version>
+    <!--springboot mybatis 版本号-->
+    <mybatis.spring.boot.version>3.0.1</mybatis.spring.boot.version>
+    <!--spring cloud oauth2 server 版本号-->
+    <oauth2.spring.boot.version>1.1.0</oauth2.spring.boot.version>
+    <!--fastjson2 版本号-->
+    <fastjson2.version>2.0.32</fastjson2.version>
+    <!--nimbusds 版本号-->
+    <nimbusds.version>2.0.32</nimbusds.version>
+  </properties>
+
+  <!--子模块继承后,提供作用:锁定版本+子module不用groupId和version-->
+  <dependencyManagement>
+    <dependencies>
+      <!--springboot-->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring.boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <!--Spring cloud-->
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>${spring.cloud.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <!--Spring cloud alibaba-->
+      <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+        <version>${spring.cloud.alibaba.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <!-- MySQL -->
+      <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>${mysql.version}</version>
+      </dependency>
+      <!-- lombok -->
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${lombok.version}</version>
+      </dependency>
+      <!-- mybatis -->
+      <dependency>
+        <groupId>org.mybatis.spring.boot</groupId>
+        <artifactId>mybatis-spring-boot-starter</artifactId>
+        <version>${mybatis.spring.boot.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.alibaba.fastjson2</groupId>
+        <artifactId>fastjson2</artifactId>
+        <version>${fastjson2.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>${spring.boot.version}</version>
+        <configuration>
+          <addResources>true</addResources>
+        </configuration>
+      </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <source>19</source>
+                <target>19</target>
+            </configuration>
+        </plugin>
+    </plugins>
+  </build>
+
+  <!--第三方maven私服-->
+  <repositories>
+    <repository>
+      <id>nexus-aliyun</id>
+      <name>Nexus aliyun</name>
+      <url>https://maven.aliyun.com/nexus/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+</project>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.sangluo.baseserver.mapper.MenuRoleMapper">
+    <resultMap id="MenuResultMap" type="cn.sangluo.baseserver.pojo.MenuRolePojo" >
+        <result column="role_id" property="roleId"/>
+        <result column="role_name" property="roleName"/>
+        <!-- 使用collection映射，注意此处时ofType -->
+        <result column="menu_id" property="menuId"/>
+        <result column="name" property="name"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="menu_type" property="menuType"/>
+        <result column="menu_code" property="menuCode"/>
+        <result column="path" property="path"/>
+        <result column="component" property="component"/>
+        <result column="request_url" property="requestUrl"/>
+        <result column="button_code" property="buttonCode"/>
+    </resultMap>
+    <select id="getDynamicRoutes" resultMap="MenuResultMap">
+        SELECT
+            sys_role.role_id,sys_menu.menu_id,sys_menu.name,sys_menu.parent_id,sys_menu.menu_type,
+            sys_menu.menu_code,sys_menu.path,sys_menu.component,sys_menu.request_url
+        FROM sys_role
+                 LEFT JOIN sys_role_menu ON sys_role.role_id = sys_role_menu.role_id
+                 RIGHT JOIN sys_menu ON sys_menu.menu_id = sys_role_menu.menu_id
+        WHERE sys_role.company_id = #{companyId} AND sys_menu.delete_status = 0 AND sys_role_menu.status = 1
+    </select>
+    <select id="getDynamicMenus" resultMap="MenuResultMap">
+        SELECT
+            sys_role.role_id,sys_menu.menu_id,sys_menu.name,sys_menu.parent_id,sys_menu.menu_type,
+            sys_menu.menu_code,sys_menu.path,sys_menu.component,sys_menu.request_url
+        FROM sys_role
+                 LEFT JOIN sys_role_menu ON sys_role.role_id = sys_role_menu.role_id
+                 RIGHT JOIN sys_menu ON sys_menu.menu_id = sys_role_menu.menu_id
+        WHERE sys_role.company_id = #{companyId}
+          AND sys_menu.menu_type = 1 AND sys_menu.delete_status = 0 AND sys_role_menu.status = 1
+    </select>
+    <select id="getMenusList" resultMap="MenuResultMap">
+        SELECT
+            sys_menu.menu_id,sys_menu.name,sys_menu.parent_id,sys_menu.menu_type,
+            sys_menu.menu_code,sys_menu.path,sys_menu.component,sys_menu.request_url,
+            sys_menu.delete_status
+        FROM sys_menu
+            <if test="_parameter.containsKey('currPage')">
+                limit #{currPage} , #{pageSize}
+            </if>
+    </select>
+    <select id="getRoleMenusMap" resultMap="MenuResultMap">
+        SELECT
+            sys_menu.menu_id,sys_menu.name,sys_menu.parent_id,sys_role_menu.status
+        FROM sys_menu
+            LEFT JOIN sys_role_menu ON
+                ( sys_role_menu.role_id = #{roleId} AND sys_role_menu.menu_id = sys_menu.menu_id)
+        WHERE sys_menu.delete_status = 0
+    </select>
+    <insert id="saveRoleMenu">
+        INSERT INTO sys_role_menu(id,role_id,menu_id,button_code)
+        VALUES (
+                #{id},
+                #{roleId},
+                #{menuId},
+                #{buttonCode}
+            )
+    </insert>
+</mapper>

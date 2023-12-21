@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.sangluo.baseserver.mapper.CommonMapper">
+    <!-- 自定义批量保存数据-->
+    <insert id="batchSaveDynamic" parameterType="java.util.Map">
+        INSERT INTO
+        <if test="tableName != null and tableName != ''">
+            ${tableName}
+        </if>
+        (
+        <foreach collection="records[0].keySet()" item="column" separator=",">
+            ${column}
+        </foreach>
+        )
+        VALUES
+        <foreach collection="records" item="record" separator=",">
+            (
+            <foreach collection="record.values()" item="value" separator=",">
+                #{value}
+            </foreach>
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        <foreach collection="records[0].keySet()" item="column" separator=",">
+            ${column} = VALUES(${column})
+        </foreach>
+    </insert>
+
+</mapper>

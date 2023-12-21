@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.sangluo.baseserver.mapper.RoleMapper">
+    <insert id="saveRole">
+        INSERT INTO sys_role
+        (role_id,role_name,company_id,delete_status,create_time,update_time,creator,update_user)
+        VALUES (
+        #{roleId},
+        #{roleName},
+        #{companyId},
+        #{deleteStatus},
+        #{createTime,jdbcType=TIMESTAMP},
+        #{updateTime,jdbcType=TIMESTAMP},
+        #{creator},
+        #{updateUser}
+        )
+    </insert>
+    <select id="verifyRoleByNameAndCompanyId" resultType="cn.sangluo.baseserver.pojo.RolePojo">
+        select role_id,role_name,create_time,update_time,creator,update_user
+        from sys_role
+        <where>
+            company_id = #{companyId}
+            and
+            role_name = #{roleName}
+        </where>
+    </select>
+    <select id="getRoleList" resultType="cn.sangluo.baseserver.pojo.RolePojo">
+        select role_id,role_name,
+               FROM_UNIXTIME(create_time/1000,'%Y-%m-%d %H:%i:%s') as create_time,
+               FROM_UNIXTIME(update_time/1000,'%Y-%m-%d %H:%i:%s') as update_time,
+               creator,update_user
+        from sys_role limit #{currIndex} , #{pageSize}
+    </select>
+    <select id="verifyRoleBycompanyId" resultType="cn.sangluo.baseserver.pojo.RolePojo">
+        select role_id,role_name,company_id,create_time,update_time,creator,update_user,delete_status
+        from sys_role where company_id = #{companyId};
+    </select>
+    <update id="updateRole" parameterType="cn.sangluo.baseserver.pojo.RolePojo">
+        update sys_role
+        <set>
+            <if test="role_name != null and role_name != ''">
+                role_name = #{roleName},
+            </if>
+            <if test="update_user != null and update_user != ''">
+                update_user = #{updateUser},
+            </if>
+        </set>
+        where role_id = #{roleId};
+    </update>
+</mapper>

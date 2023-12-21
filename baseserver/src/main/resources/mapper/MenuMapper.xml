@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.sangluo.baseserver.mapper.MenuMapper">
+    <insert id="saveMenu">
+        INSERT INTO sys_menu
+        (menu_id,name,parent_id,menu_type,menu_code,request_url,path,component,menu_level,menu_level_code,delete_status)
+        VALUES (
+                   #{menuId},
+                   #{name},
+                   #{parentId},
+                   #{menuType},
+                   #{menuCode},
+                   #{requestUrl},
+                   #{path},
+                   #{component},
+                   #{menuLevel},
+                   #{menuLevelCode},
+                   #{deleteStatus}
+               )
+    </insert>
+    <select id="getMenuCodeByMenuUrl" resultType="cn.sangluo.baseserver.pojo.MenuPojo">
+        select menu_code from sys_menu where request_url = #{requestUrl}
+    </select>
+    <select id="getAllMenuCodeList" resultType="cn.sangluo.baseserver.pojo.MenuPojo">
+        select menu_code,requestUrl from sys_menu;
+    </select>
+    <update id="upDataMenu" parameterType="cn.sangluo.baseserver.pojo.MenuPojo">
+        update sys_menu
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="parent_id != null and parent_id != ''">
+                parent_id = #{parentId},
+            </if>
+            <if test="menu_type != null and menu_type != ''">
+                menu_type = #{menuType},
+            </if>
+            <if test="menu_code != null and menu_code != ''">
+                menu_code = #{menuCode},
+            </if>
+            <if test="request_url != null and request_url != ''">
+                request_url = #{requestUrl},
+            </if>
+            <if test="path != null and path != ''">
+                path = #{path},
+            </if>
+            <if test="component != null and component != ''">
+                component = #{component},
+            </if>
+            <if test="menu_level != null and menu_level != ''">
+                menu_level = #{menuLevel},
+            </if>
+            <if test="menu_level_code != null and menu_level_code != ''">
+                menu_level_code = #{menuLevelCode},
+            </if>
+            <if test="delete_status != null and delete_status != ''">
+                delete_status = #{deleteStatus},
+            </if>
+
+        </set>
+        where menu_id = #{menuId};
+    </update>
+</mapper>

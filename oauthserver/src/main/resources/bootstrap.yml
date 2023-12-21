@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: oauthserver  #指定项目的名字
+  cloud:
+    nacos:
+      discovery:  #用于服务发现
+        server-addr: localhost:8848  #nacos配置中心地址和端口
+      config:     #指定配置中心
+        namespace: sangluo-dev
+        group: dev
+        server-addr: localhost:8848  #nacos配置中心地址和端口
+        file-extension: yml  #指定服务配置格式,严格要求,下面会说到有几种格式

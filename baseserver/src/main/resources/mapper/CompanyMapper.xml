@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.sangluo.baseserver.mapper.CompanyMapper">
+    <insert id="saveCompany">
+        insert into company(company_id,company_name,create_time,update_time,creator,update_user)
+        values(
+                  #{companyId},
+                  #{companyName},
+                  #{createTime,jdbcType=TIMESTAMP},
+                  #{updateTime,jdbcType=TIMESTAMP},
+                  #{creator},
+                  #{updateUser}
+              )
+    </insert>
+    <select id="verifyCompanyByName" resultType="cn.sangluo.baseserver.pojo.CompanyPojo">
+        select company_id,company_name,create_time,update_time,creator,update_user
+        from company where company_name = #{companyName};
+    </select>
+    <update id="updateCompany" parameterType="cn.sangluo.baseserver.pojo.CompanyPojo">
+        update company
+        <set>
+            <if test="company_name != null and company_name != ''">
+                company_name = #{companyName},
+            </if>
+            <if test="update_user != null and update_user != ''">
+                update_user = #{updateUser},
+            </if>
+            <if test="updateTime != null and updateTime != ''">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where company_id = #{companyId};
+    </update>
+</mapper>

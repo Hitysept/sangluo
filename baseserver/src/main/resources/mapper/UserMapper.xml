@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.sangluo.baseserver.mapper.UserMapper">
+    <select id="getUsersList" resultType="cn.sangluo.baseserver.pojo.UserPojo">
+        select user_id,user_name,nick_name,email,head_img,token, from user_info
+    </select>
+    <select id="getUserByUserId" resultType="cn.sangluo.baseserver.pojo.UserPojo">
+        select user_id,user_name,company_id,nick_name,email,head_img,token from user_info where user_id = #{userId};
+    </select>
+    <select id="getCompanyIdByUserId" resultType="cn.sangluo.baseserver.pojo.UserPojo">
+        select user_id,user_name,company_id from user_info where user_id = #{userId};
+    </select>
+    <select id="getUsersByEmail" resultType="cn.sangluo.baseserver.pojo.UserPojo">
+        select user_id,user_name,nick_name,company_id,email,head_img,token from user_info where email = #{email};
+    </select>
+    <select id="getUsersByToken" resultType="cn.sangluo.baseserver.pojo.UserPojo">
+        select user_id,user_name,nick_name,company_id,email,head_img,token,company_id from user_info where token = #{token};
+    </select>
+    <select id="verifyUserByName" resultType="cn.sangluo.baseserver.pojo.UserPojo">
+        select * from user_info where (email = #{nameStr} or user_name = #{nameStr})
+        and password = #{password}
+    </select>
+    <insert id="userRegister">
+        insert into user_info(user_id,user_name,nick_name,password,email,head_img,create_time,update_time)
+        values(
+        #{userId},
+        #{userName},
+        #{nickName},
+        #{password},
+        #{email},
+        #{headImg, jdbcType=BLOB},
+        #{createTime,jdbcType=TIMESTAMP},
+        #{updateTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+    <update id="setUserToken" parameterType="cn.sangluo.baseserver.pojo.UserPojo">
+        update user_info
+        <set>
+            <if test="token != null and token != ''">
+                token= #{token},
+            </if>
+            <if test="updateTime != null and updateTime != ''">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where user_id = #{userId};
+    </update>
+</mapper>
