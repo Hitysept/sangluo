@@ -37,5 +37,5 @@ public interface RoleController {
     @RequestMapping("/getRoleList")
     ResultJsonUtil<Object> getRoleList(@RequestParam("currPage") int currPage,@RequestParam("pageSize") int pageSize);
     @RequestMapping("/saveRoleMenu")
-    ResultJsonUtil<Object> saveRoleMenu(@RequestBody Object[] paramInfo);
+    ResultJsonUtil<Object> saveRoleMenu(@RequestBody Map<String, Object>[] paramInfo);
 }

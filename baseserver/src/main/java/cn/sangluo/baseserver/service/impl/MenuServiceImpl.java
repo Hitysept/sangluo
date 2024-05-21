@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +59,15 @@ public class MenuServiceImpl implements MenuService {
         return reMenuList;
     }
     @Override
+    public List<String> getDynamicRoutesList(String companyId) {
+        List<MenuRolePojo> menuList = MenuRoleMapper.getDynamicRoutes(companyId);
+        List<String> roleList = new ArrayList<>();
+        for (MenuRolePojo menuRolePojo: menuList){
+            roleList.add(menuRolePojo.getRequestUrl());
+        }
+        return roleList;
+    }
+    @Override
     public List<MenuRolePojo> getDynamicMenus(String companyId) {
         List<MenuRolePojo> menuRolePojoList = MenuRoleMapper.getDynamicMenus(companyId);
         List<MenuRolePojo> reMenuList;
@@ -79,11 +89,15 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    public Integer getMenusListTotal() {
+        return MenuRoleMapper.getMenusListTotal();
+    }
+
+    @Override
     public List<MenuRolePojo> getRoleMenusMap(String roleId) {
         return MenuRoleMapper.getRoleMenusMap(roleId);
     }
 
-    @Override
     public int saveRoleMenu(List<Map<String, Object>> menuRoleList) {
         return commonMapper.batchSaveDynamic("sys_role_menu",menuRoleList);
     }

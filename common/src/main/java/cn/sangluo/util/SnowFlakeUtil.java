@@ -14,12 +14,12 @@ public class SnowFlakeUtil {
     /**
      * 机器ID  2进制5位
      */
-    private long workerId;
+    private final long workerId;
 
     /**
      * 机房ID 2进制5位
      */
-    private long datacenterId;
+    private final long datacenterId;
 
     /**
      * 代表一毫秒内生成的多个id的最新序号  12位，范围从0到4095

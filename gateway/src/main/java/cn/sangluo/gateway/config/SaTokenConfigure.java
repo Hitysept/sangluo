@@ -1,7 +1,6 @@
 package cn.sangluo.gateway.config;
 
 import cn.dev33.satoken.context.SaHolder;
-import cn.dev33.satoken.jwt.StpLogicJwtForSimple;
 import cn.dev33.satoken.reactor.context.SaReactorSyncHolder;
 import cn.dev33.satoken.reactor.filter.SaReactorFilter;
 import cn.dev33.satoken.router.SaHttpMethod;
@@ -26,10 +25,10 @@ import org.springframework.web.server.ServerWebExchange;
  */
 @Configuration
 public class SaTokenConfigure {
-    @Bean
-    public StpLogic getStpLogicJwt() {
-        return new StpLogicJwtForSimple();
-    }
+//    @Bean
+//    public StpLogic getStpLogicJwt() {
+//        return new StpLogicJwtForSimple();
+//    }
     // 注册 Sa-Token全局过滤器
     @Bean
     public SaReactorFilter getSaReactorFilter(){
@@ -38,6 +37,9 @@ public class SaTokenConfigure {
                 .addInclude("/**")
                 // 开放地址
                 .addExclude("/favicon.ico",
+                        "/oauth/login",
+                        "/oauth/testPost",
+                        "/oauth/testGet",
                         "/userInfo/userRegister",
                         "/userInfo/verifyUserByName",
                         "/role/verifyRoleByUserId")

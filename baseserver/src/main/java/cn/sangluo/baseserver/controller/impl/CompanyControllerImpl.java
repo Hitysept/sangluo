@@ -22,7 +22,7 @@ import java.util.List;
  */
 @RestController
 public class CompanyControllerImpl implements CompanyController {
-    private CompanyService companyService;
+    private final CompanyService companyService;
     @Autowired
     private CompanyControllerImpl(CompanyService companyService){this.companyService = companyService;}
     /**

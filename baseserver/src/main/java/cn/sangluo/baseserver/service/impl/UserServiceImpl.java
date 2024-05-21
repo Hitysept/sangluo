@@ -63,8 +63,8 @@ public class UserServiceImpl implements UserService {
        */
     @Override
     public UserPojo verifyUserByName(String nameStr,String password){
-        String aesEncryptPassword = SangluoSecureUtil.aesEncrypt(publicKey+privateKey,password);
-        return userMapper.verifyUserByName(nameStr,aesEncryptPassword);
+        String md5BySaltPassword = SangluoSecureUtil.aesEncrypt(publicKey+privateKey,password);
+        return userMapper.verifyUserByName(nameStr,md5BySaltPassword);
     }
     /**
        * @MethodName setUserToken

@@ -20,13 +20,17 @@ public interface UserLoginController {
     /**
      * 登录校验
      */
-    @PostMapping ("/login")
-    ResultJsonUtil<Object> login(@RequestBody Map<String,Object> userInfo) throws ExecutionException, InterruptedException, TimeoutException;
+    @RequestMapping ("/login")
+    ResultJsonUtil<Object> login(@RequestBody Map<String,Object> userInfo) throws Exception;
 
     /**
      * 登出
      */
     @RequestMapping("/logout")
     ResultJsonUtil<Object> logout(@RequestParam String id);
+    @PostMapping ("/testPost")
+    ResultJsonUtil<Object> testPost(@RequestBody Map<String,Object> Info);
+    @GetMapping ("/testGet")
+    ResultJsonUtil<Object> testGet(@RequestParam String id);
 
 }

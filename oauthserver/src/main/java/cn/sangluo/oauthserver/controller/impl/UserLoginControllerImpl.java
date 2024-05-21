@@ -1,20 +1,20 @@
 package cn.sangluo.oauthserver.controller.impl;
 
 import cn.sangluo.constant.ResponseStatusCodeConstant;
+import cn.sangluo.constant.SangluoConfigConstant;
 import cn.sangluo.oauthserver.controller.UserLoginController;
+import cn.sangluo.oauthserver.feign.UserFeignService;
+import cn.sangluo.oauthserver.service.UserService;
 import cn.sangluo.util.ResultJsonUtil;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.sangluo.util.SangluoFoxUtil;
+import cn.sangluo.util.SangluoSecureUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.*;
 
 /**
  * @ClassName UserLoginControllerImpl
@@ -26,50 +26,30 @@ import java.util.concurrent.*;
 @RestController
 public class UserLoginControllerImpl implements UserLoginController {
 
-    private final WebClient.Builder webClientBuilder;
+    private final UserService userService;
+
+    private final String publicKey = SangluoConfigConstant.PublicKey;
+    private final String privateKey = SangluoConfigConstant.PrivateKey;
     @Autowired
-    public UserLoginControllerImpl(WebClient.Builder webClientBuilder) {this.webClientBuilder = webClientBuilder;}
-    ExecutorService executorService = Executors.newCachedThreadPool();
+    public UserLoginControllerImpl(UserService userService) {this.userService = userService;}
     @Override
-    public ResultJsonUtil<Object> login(Map<String,Object> userInfo) throws ExecutionException, InterruptedException, TimeoutException {
+    public ResultJsonUtil<Object> login(Map<String,Object> userInfo) throws Exception {
         ResultJsonUtil<Object> resultJsonUtil = null;
         ResultJsonUtil<Object> responseJsonUtil = new ResultJsonUtil<>();
-        try{
-            String url = "http://127.0.0.1:48081/userInfo/verifyUserByName";
-            WebClient webClient = webClientBuilder.build();
-            Mono<ResultJsonUtil<Object>> userVerifymono =
-                    webClient.post().uri(url).
-                            contentType(MediaType.APPLICATION_JSON_UTF8).
-                            body(BodyInserters.fromValue(userInfo)).
-                            retrieve().
-                            bodyToMono(new ParameterizedTypeReference<>() {});
-            Future<ResultJsonUtil<Object>> userVerifyfuture = executorService.submit(() -> userVerifymono.block());
-            resultJsonUtil = userVerifyfuture.get(5, TimeUnit.SECONDS);
-            if(resultJsonUtil.getCode() == 1){
-                Map userMap = (Map) resultJsonUtil.getData();
-                String userId = userMap.get("userId").toString();
-                //注销当前所需要登录id（注销token）
-                StpUtil.logout(userId, "PC");
-                StpUtil.login(userId,"PC");
-                String token = StpUtil.getTokenValue();
-                Map<String,Object> setTokenInfo = new HashMap<>();
-                setTokenInfo.put("userId",userId);
-                setTokenInfo.put("token",token);
-                String setTokenUrl = "http://127.0.0.1:48081/userInfo/setUserToken";
-                Mono<ResultJsonUtil<Object>> setTokenmono =
-                        webClient.post().uri(setTokenUrl).
-                                contentType(MediaType.APPLICATION_JSON_UTF8).
-                                body(BodyInserters.fromValue(setTokenInfo)).
-                                retrieve().
-                                bodyToMono(new ParameterizedTypeReference<>() {});
-                Future<ResultJsonUtil<Object>> setTokenfuture = executorService.submit(() -> setTokenmono.block());
-                ResultJsonUtil<Object> setToken = setTokenfuture.get(5, TimeUnit.SECONDS);
-                responseJsonUtil = setToken;
-            }else{
-                responseJsonUtil.fail(resultJsonUtil.getMsg());
-            }
-        }catch (InterruptedException | TimeoutException | ExecutionException e) {
-            throw new RuntimeException(e);
+        resultJsonUtil = userService.verifyUserByName(userInfo);
+
+        if(resultJsonUtil.getCode() == 1 && resultJsonUtil.getData() instanceof LinkedHashMap userMap){
+            String userId = userMap.get("userId").toString();
+            //注销当前所需要登录id（注销token）
+            StpUtil.logout(userId, "PC");
+            StpUtil.login(userId,"PC");
+            String token = StpUtil.getTokenValue();
+            Map<String,Object> setTokenInfo = new HashMap<>();
+            setTokenInfo.put("userId",userId);
+            setTokenInfo.put("token",token);
+            responseJsonUtil = userService.setUserToken(setTokenInfo);
+        }else{
+            responseJsonUtil.fail(resultJsonUtil.getMsg());
         }
         return responseJsonUtil;
     }
@@ -78,5 +58,19 @@ public class UserLoginControllerImpl implements UserLoginController {
     public ResultJsonUtil<Object> logout(String id) {
         StpUtil.logout(id);
         return new ResultJsonUtil<>().customized(ResponseStatusCodeConstant.SUCCESSFUL_CODE,"你已下线","");
+    }
+
+    @Override
+    public ResultJsonUtil<Object> testPost(Map<String, Object> Info) {
+        ResultJsonUtil<Object> resultJsonUtil = null;
+        resultJsonUtil = userService.Test(Info);
+        return resultJsonUtil;
+    }
+    @Override
+    public ResultJsonUtil<Object> testGet(String id) {
+        return new ResultJsonUtil<>().
+                customized(
+                        ResponseStatusCodeConstant.SUCCESSFUL_CODE,
+                        SangluoSecureUtil.aesEncrypt(publicKey+privateKey,id),id);
     }
 }

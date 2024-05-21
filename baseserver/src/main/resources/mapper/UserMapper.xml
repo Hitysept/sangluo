@@ -3,7 +3,7 @@
 
 <mapper namespace="cn.sangluo.baseserver.mapper.UserMapper">
     <select id="getUsersList" resultType="cn.sangluo.baseserver.pojo.UserPojo">
-        select user_id,user_name,nick_name,email,head_img,token, from user_info
+        select user_id,user_name,nick_name,email,head_img,token from user_info;
     </select>
     <select id="getUserByUserId" resultType="cn.sangluo.baseserver.pojo.UserPojo">
         select user_id,user_name,company_id,nick_name,email,head_img,token from user_info where user_id = #{userId};

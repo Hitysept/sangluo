@@ -14,5 +14,6 @@ public interface MenuRoleMapper {
     List<MenuRolePojo> getDynamicMenus(String companyId);
     List<MenuRolePojo> getMenusList(@Param("currPage") int currPage,@Param("pageSize") int pageSize);
     List<MenuRolePojo> getMenusList();
+    Integer getMenusListTotal();
     List<MenuRolePojo> getRoleMenusMap(String roleId);
 }

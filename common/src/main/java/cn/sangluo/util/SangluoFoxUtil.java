@@ -14,6 +14,10 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @ClassName SangluoFoxUtil
  * @Description TODO
@@ -56,6 +60,26 @@ public class SangluoFoxUtil {
             sb.append(str.charAt(number));
         }
         return sb.toString();
+    }
+
+    /**
+     * @param obj 来源对象
+     * @return map
+     * @throws Exception
+     */
+    public static Map<String, Object> objectToMap(Object obj) throws Exception {
+        if (obj == null) {
+            return null;
+        }
+        Map<String, Object> map = new HashMap<>();
+        Class<?> clazz = obj.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            field.setAccessible(true); // 允许访问私有成员变量
+            Object fieldValue = field.get(obj);
+            map.put(field.getName(), fieldValue);
+        }
+        return map;
     }
 
     /**

@@ -16,13 +16,16 @@
         <result column="request_url" property="requestUrl"/>
         <result column="button_code" property="buttonCode"/>
     </resultMap>
+    <resultMap id="count" type="java.lang.Integer">
+        <result column="total"/>
+    </resultMap>
     <select id="getDynamicRoutes" resultMap="MenuResultMap">
         SELECT
             sys_role.role_id,sys_menu.menu_id,sys_menu.name,sys_menu.parent_id,sys_menu.menu_type,
             sys_menu.menu_code,sys_menu.path,sys_menu.component,sys_menu.request_url
         FROM sys_role
                  LEFT JOIN sys_role_menu ON sys_role.role_id = sys_role_menu.role_id
-                 RIGHT JOIN sys_menu ON sys_menu.menu_id = sys_role_menu.menu_id
+                 LEFT JOIN sys_menu ON sys_menu.menu_id = sys_role_menu.menu_id
         WHERE sys_role.company_id = #{companyId} AND sys_menu.delete_status = 0 AND sys_role_menu.status = 1
     </select>
     <select id="getDynamicMenus" resultMap="MenuResultMap">
@@ -33,7 +36,7 @@
                  LEFT JOIN sys_role_menu ON sys_role.role_id = sys_role_menu.role_id
                  RIGHT JOIN sys_menu ON sys_menu.menu_id = sys_role_menu.menu_id
         WHERE sys_role.company_id = #{companyId}
-          AND sys_menu.menu_type = 1 AND sys_menu.delete_status = 0 AND sys_role_menu.status = 1
+          AND sys_menu.menu_type = 1 AND sys_menu.delete_status = 0 AND sys_role_menu.status = 1;
     </select>
     <select id="getMenusList" resultMap="MenuResultMap">
         SELECT
@@ -42,8 +45,11 @@
             sys_menu.delete_status
         FROM sys_menu
             <if test="_parameter.containsKey('currPage')">
-                limit #{currPage} , #{pageSize}
+                limit #{currPage} , #{pageSize};
             </if>
+    </select>
+    <select id="getMenusListTotal" resultMap="count">
+        SELECT COUNT(*) as total  FROM sys_menu;
     </select>
     <select id="getRoleMenusMap" resultMap="MenuResultMap">
         SELECT

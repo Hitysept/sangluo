@@ -18,7 +18,7 @@ import java.util.List;
  */
 @Service
 public class CompanyServiceImpl implements CompanyService {
-    private CompanyMapper companyMapper;
+    private final CompanyMapper companyMapper;
     @Autowired
     private CompanyServiceImpl (CompanyMapper companyMapper){this.companyMapper = companyMapper;}
     @Override

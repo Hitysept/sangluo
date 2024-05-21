@@ -1,7 +1,6 @@
 package cn.sangluo.baseserver.controller.impl;
 
-import cn.sangluo.baseserver.common.TreeBuildUtil;
-import cn.sangluo.baseserver.pojo.MenuPojo;
+
 import cn.sangluo.baseserver.pojo.MenuRolePojo;
 import cn.sangluo.baseserver.service.MenuService;
 import cn.sangluo.constant.ResponseMessageConstant;
@@ -11,8 +10,10 @@ import cn.sangluo.baseserver.pojo.UserPojo;
 import cn.sangluo.baseserver.service.UserService;
 import cn.sangluo.util.ResultJsonUtil;
 import cn.sangluo.util.SangluoFoxUtil;
+import com.alibaba.fastjson2.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -27,10 +28,12 @@ import java.util.Map;
 public class UserControllerImpl implements UserController {
     private final UserService userService;
     private final MenuService menuService;
+    private RedisTemplate<String, String> redisTemplate;
     @Autowired
-    public UserControllerImpl(UserService userService,MenuService menuService){
+    public UserControllerImpl(UserService userService, MenuService menuService, RedisTemplate<String, String> redisTemplate){
         this.menuService = menuService;
         this.userService = userService;
+        this.redisTemplate = redisTemplate;
     }
 
     /**
@@ -86,7 +89,6 @@ public class UserControllerImpl implements UserController {
             }
         }catch (NullPointerException e){
             final Throwable cause = e.getCause();
-            System.out.println(cause);
             resp.fail(ResponseMessageConstant.OAUTH_ACCOUNT_ERROR);
         }
         return resp;
@@ -106,20 +108,23 @@ public class UserControllerImpl implements UserController {
         userPojo.setToken(userSatokenInfo.get("token").toString());
         userPojo.setUpdateTime(String.valueOf(System.currentTimeMillis()));
         try {
-            Map respMap = new HashMap();
+            Map<String,Object> respMap = new HashMap<>();
             UserPojo respUserPojo = userService.setUserToken(userPojo);
             //通过用户id获取到role角色id
             List<MenuRolePojo> menuList = menuService.getDynamicRoutes(respUserPojo.getCompanyId());
+            List<String> roleList = menuService.getDynamicRoutesList(respUserPojo.getCompanyId());
+            redisTemplate.opsForValue().set(userSatokenInfo.get("userId").toString(), respUserPojo.getCompanyId());
+            redisTemplate.opsForValue().set(respUserPojo.getCompanyId(), JSON.toJSONString(roleList));
             respMap.put("menuInfo",menuList);
             respMap.put("userInfo",respUserPojo);
             resp.success(respMap);
         }catch (DataAccessException e){
             final Throwable cause = e.getCause();
-            System.out.println(cause);
             resp.fail(ResponseMessageConstant.DATA_SAVE_FAIL);
         }
         return resp;
     }
+
 
     /**
      * 根据用户id查询用户
@@ -130,5 +135,10 @@ public class UserControllerImpl implements UserController {
     public ResultJsonUtil<Object> getUserByUserId(String userId) {
         UserPojo userPojo = userService.getUserByUserId(userId);
         return new ResultJsonUtil<>().success(userPojo);
+    }
+    @Override
+    public ResultJsonUtil<Object> Test(Map<String, Object> userSatokenInfo) {
+        ResultJsonUtil<Object> resp = new ResultJsonUtil<>();
+        return resp.success(userSatokenInfo);
     }
 }

@@ -19,6 +19,9 @@ public interface UserController {
     ResultJsonUtil<Object> verifyUserByName(@RequestBody Map<String,Object> userInfo);
     @PostMapping("/setUserToken")
     ResultJsonUtil<Object> setUserToken(@RequestBody Map<String,Object> userSatokenInfo);
+    @PostMapping("/Test")
+    ResultJsonUtil<Object> Test(@RequestBody Map<String,Object> userSatokenInfo);
     @GetMapping("/getUserByUserId")
     ResultJsonUtil<Object> getUserByUserId(@RequestParam("userId") String userId);
+
 }

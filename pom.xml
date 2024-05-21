@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>cn.sangluo</groupId>
   <artifactId>sangluo</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
   <packaging>pom</packaging>
 
   <name>sangluo</name>
@@ -28,6 +28,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>20</maven.compiler.source>
     <maven.compiler.target>20</maven.compiler.target>
+    <maven.version>3.8.1</maven.version>
+    <maven.jar.version>2.4</maven.jar.version>
     <!--junit 版本号-->
     <junit.version>4.12</junit.version>
     <!--log4j 版本号-->
@@ -37,13 +39,15 @@
     <!--jwt 版本号-->
     <jwt.version>8.16</jwt.version>
     <!-- sa-token -->
-    <sa.token.version>1.34.0</sa.token.version>
+    <sa.token.version>1.38.0</sa.token.version>
     <!--MySQL 版本号-->
     <mysql.version>8.0.32</mysql.version>
     <!--springboot 版本号-->
     <spring.boot.version>3.0.2</spring.boot.version>
     <!--spring cloud 版本号-->
     <spring.cloud.version>2022.0.0</spring.cloud.version>
+    <!--spring cloud openfeign 版本号-->
+    <spring.cloud.openFeign.version>4.0.6</spring.cloud.openFeign.version>
     <!--spring cloud alibaba 版本号-->
     <spring.cloud.alibaba.version>2022.0.0.0-RC2</spring.cloud.alibaba.version>
     <!--springboot mybatis 版本号-->
@@ -54,6 +58,7 @@
     <fastjson2.version>2.0.32</fastjson2.version>
     <!--nimbusds 版本号-->
     <nimbusds.version>2.0.32</nimbusds.version>
+    <bcprov.version>1.69</bcprov.version>
   </properties>
 
   <!--子模块继承后,提供作用:锁定版本+子module不用groupId和version-->
@@ -83,10 +88,26 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+        <version>${spring.boot.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-actuator</artifactId>
+        <version>${spring.boot.version}</version>
+      </dependency>
+      <!--Spring cloud openFeign-->
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-openfeign</artifactId>
+        <version>${spring.cloud.openFeign.version}</version>
+      </dependency>
       <!-- MySQL -->
       <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
+        <groupId>com.mysql</groupId>
+        <artifactId>mysql-connector-j</artifactId>
         <version>${mysql.version}</version>
       </dependency>
       <!-- lombok -->
@@ -106,6 +127,34 @@
         <artifactId>fastjson2</artifactId>
         <version>${fastjson2.version}</version>
       </dependency>
+      <!-- sa-token -->
+      <dependency>
+        <groupId>cn.dev33</groupId>
+        <artifactId>sa-token-spring-boot3-starter</artifactId>
+        <version>${sa.token.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.dev33</groupId>
+        <artifactId>sa-token-redis-jackson</artifactId>
+        <version>${sa.token.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.dev33</groupId>
+        <artifactId>sa-token-reactor-spring-boot3-starter</artifactId>
+        <version>${sa.token.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.sangluo</groupId>
+        <artifactId>common</artifactId>
+        <version>1.0</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+          </exclusion>
+        </exclusions>
+        <scope>compile</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
@@ -117,15 +166,14 @@
         <configuration>
           <addResources>true</addResources>
         </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-                <source>19</source>
-                <target>19</target>
-            </configuration>
-        </plugin>
     </plugins>
   </build>
 

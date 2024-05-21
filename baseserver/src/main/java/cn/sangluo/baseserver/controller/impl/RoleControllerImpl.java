@@ -18,11 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @ClassName RoleControllerImpl
@@ -36,7 +32,7 @@ public class RoleControllerImpl implements RoleController {
     private final RoleService roleService;
     private final UserService userService;
     private final MenuService menuService;
-    private ResultJsonUtil<Object> resp = new ResultJsonUtil<>();
+    private final ResultJsonUtil<Object> resp = new ResultJsonUtil<>();
     @Autowired
     public RoleControllerImpl(RoleService roleService,UserService userService,MenuService menuService) {
         this.roleService = roleService;
@@ -73,7 +69,7 @@ public class RoleControllerImpl implements RoleController {
             }
         }catch (DataAccessException e){
             final Throwable cause = e.getCause();
-            resp.fail(ResponseMessageConstant.DATA_SAVE_FAIL);
+            resp.fail(ResponseMessageConstant.DATA_SAVE_FAIL + cause.getMessage());
         }
         return resp;
     }
@@ -92,7 +88,7 @@ public class RoleControllerImpl implements RoleController {
        * @Date 18:21 2023/10/18
        */
     @Override
-    public ResultJsonUtil<Object> saveMenu(Map paramInfo) throws DataAccessException {
+    public ResultJsonUtil<Object> saveMenu(Map<String,Object> paramInfo) throws DataAccessException {
         MenuPojo menuPojo = JSON.parseObject(JSON.toJSONString(paramInfo), MenuPojo.class);
         try{
             List<MenuPojo> list = menuService.getMenuCodeByMenuUrl(menuPojo.getPath());
@@ -109,7 +105,7 @@ public class RoleControllerImpl implements RoleController {
             }
         }catch (DataAccessException e){
             final Throwable cause = e.getCause();
-            resp.fail(ResponseMessageConstant.DATA_SAVE_FAIL);
+            resp.fail(ResponseMessageConstant.DATA_SAVE_FAIL + cause.getMessage());
         }
         resp.success(ResponseMessageConstant.REQUEST_SUCCESS);
         return resp;
@@ -138,8 +134,7 @@ public class RoleControllerImpl implements RoleController {
             resp.success(roleList);
         }catch (NullPointerException e){
             final Throwable cause = e.getCause();
-            System.out.println(cause);
-            resp.fail(ResponseMessageConstant.OAUTH_ACCOUNT_ERROR);
+            resp.fail(ResponseMessageConstant.OAUTH_ACCOUNT_ERROR+","+cause.getMessage());
         }
         return resp;
     }
@@ -175,7 +170,13 @@ public class RoleControllerImpl implements RoleController {
     @Override
     public ResultJsonUtil<Object> getMenusList(int currPage, int pageSize) {
         List<MenuRolePojo> menuList = menuService.getMenusList(currPage, pageSize);
-        resp.success(menuList);
+        Integer total = menuService.getMenusListTotal();
+        Map<String,Object> reMap = new HashMap<>();
+        reMap.put("List",menuList);
+        reMap.put("total",total);
+        reMap.put("currPage",currPage);
+        reMap.put("pageSize",pageSize);
+        resp.success(reMap);
         return resp;
     }
 
@@ -215,8 +216,9 @@ public class RoleControllerImpl implements RoleController {
     }
 
     @Override
-    public ResultJsonUtil<Object> saveRoleMenu(Object[] paramInfo) {
-        List paramList = Arrays.asList(paramInfo);
+    public ResultJsonUtil<Object> saveRoleMenu(Map<String, Object>[] paramInfo) {
+//        List paramList = Arrays.asList(paramInfo);
+        List<Map<String,Object>> paramList = Arrays.stream(paramInfo).toList();
         int res = menuService.saveRoleMenu(paramList);
         resp.success(res);
         return resp;
